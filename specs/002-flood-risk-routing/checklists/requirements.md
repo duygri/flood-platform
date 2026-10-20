@@ -32,7 +32,7 @@
 ## Notes
 
 - Rà soát 16/16 mục; đây là kiểm tra tài liệu, không phải kết quả chạy sản phẩm.
-- Giả định cần xác nhận ở clarify: dự báo ba giờ, bán kính 1 km, bốn mức rủi ro.
+- Dự báo 3 giờ, bán kính 1 km và bốn mức rủi ro đã được chốt ở clarify.
 - Công thức/ngưỡng, độ mới nguồn và tổng hợp tuyến cần chốt trong plan trước triển khai/nghiệm thu.
 - Spec 001 chưa triển khai hoàn chỉnh; đã ghi phụ thuộc, không sửa spec 001.
 - Không có hook trước/sau specify vì `.specify/extensions.yml` không tồn tại.

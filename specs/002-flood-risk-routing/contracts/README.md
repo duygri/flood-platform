@@ -51,6 +51,20 @@ Bốn số liệu tuyến bắt buộc: highVeryHighMeters, missingMeters, route
 durationSeconds; routeRiskScore=null khi không có đoạn known, partial có coverage
 và cảnh báo. Xếp hạng/fallback theo risk-rules.md, không tất định đảm bảo3tuyến.
 
+`WeatherSnapshot` dùng chung chứa capturedAt, nguồn/dataTime/fetchedAt, current,
+ba giờ dự báo, chất lượng và mode/scenario. `WeatherResponse.weatherSnapshot` chỉ
+phục vụ US1 khi chưa tính risk. `RiskResponse.weatherSnapshot` bắt buộc là giá trị
+đã dùng tính risk; UI mưa/Recharts sau risk chỉ đọc payload này, không ghép response
+weather khác. Kiểm ca cache hết hạn giữa lời gọi US1 W1 và risk W2: chart dùng W2,
+kể cả khi W1 về muộn. Không tạo mã snapshot, endpoint lookup hoặc snapshot store.
+
+Routing trả `RouteResponse.weatherSnapshots` tối đa12 phần tử `{cell, weatherSnapshot}`;
+cell chỉ tọa độ ô làm tròn. Mỗi `RouteSegment.weatherSnapshotIndexes` tham chiếu các
+vị trí ngay trong mảng response, luôn trong bounds và trỏ đúng ô đã tính sample.
+UI chi tiết đoạn/tuyến dùng snapshot nhúng đó, không gọi lại weather; biểu đồ điểm
+risk vẫn dùng snapshot của RiskResponse. Nguồn thiếu có snapshot unavailable/null
+rõ ràng, không bỏ hoặc thay mưa0. Không persist/log snapshot và không state lookup RAM.
+
 ## Worker contract
 
 .NET→private worker `POST /internal/v1/image-assessments`, raw body JPEG/PNG,

@@ -14,6 +14,8 @@ Version/hash immutable heuristic config, pure .NET Risk với sources/timestamps
 missing=null và uncertainty reserve minh bạch. Không tuyên bố xác suất/độ chính xác
 thực địa. Rerank1–3 candidate hợp lệ trong vùng bằng tuple đã clarify và ngưỡng
 min(1.5Tfastest,Tfastest+600s), luôn công bố bốn số liệu và missing length.
+“Cải thiện nguy cơ” so bộ ba highVeryHighMeters/routeRiskScore/missingMeters theo
+thứ tự từ điển với fastest; chỉ không có cải thiện trong ngưỡng mới fallback fastest.
 PostGIS kiểm toàn LineString bằng Covers; không clipping đường ngoài vùng.
 Profile car.lua chỉ ô tô tham khảo, không giả tuyến xe máy. Route aggregate phần
 known có nhãn partial; allunknown=null, không dùng0 cho missing.

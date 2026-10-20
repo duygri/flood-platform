@@ -7,6 +7,9 @@ hai bản độc lập. Mọi thay đổi giá trị hoặc thuật toán đổi
 golden cases. Không override trọng số qua env mà giữ version cũ. Rule snapshot,
 zone/dataset/scenario version cố định trong toàn request, mismatch409.
 
+Bản vá thiết kế `risk-v1.0.1` đồng bộ định nghĩa cải thiện theo bộ ba và checksum
+manifest; tên file `risk-rules-v1.json` vẫn chỉ họ phiên bản v1, không đổi trọng số/ngưỡng.
+
 ## Đầu vào và chuẩn hoá
 
 Hàm clamp(x)=min(1,max(0,x)). Tất cả tính double hữu hạn, cấm NaN/Infinity/âm.
@@ -27,7 +30,9 @@ Severity lịch sử low=.25, medium=.5, high=.75, severe=1. Trường severity 
 unknown, không gán low. Reliability = declaredConfidence [0,1] * verificationFactor,
 verified=1, unverified=.5, unknown=.25; UI hiển thị cả hai. Không có trùng lặp thì dùng
 max nên thêm bản sao điểm không tự tăng risk. Dataset phải có metadata vùng đã khảo
-sát và coverageComplete; H=0 chỉ khi dataset xác nhận coverage đủ, có0điểm phù hợp.
+sát và coverageComplete; H = 0 khi dữ liệu đủ phủ và giá trị tổng hợp bằng 0, gồm
+cả trường hợp không có điểm phù hợp hoặc các điểm đều có đóng góp 0 (ví dụ đúng
+1.000 m theo R13).
 Dataset thiếu/coverage không đủ hoặc điểm gần có severity không biết thì Hmissing;
 không dùng không có điểm để khẳng định không có nguy cơ.
 
@@ -113,10 +118,14 @@ JSON không có Infinity. Risk và mét so bằng giá trị chưa round UI; tie
 <=1e-6 score và <=0.01m, để thứ tự xác định dùng lượng tử cố định decimal 6score/2m
 trước comparator, không comparator epsilon không bắc cầu. Trọng số/tolerance versioned.
 
-Tuyến ít nguy cơ hơn: tuple `(highMeters,score)` nhỏ hơn fastest; nếu hai tiêu chí
-bằng nhau, thiếu ít hơn ưu tiên nhưng giải thích là “ít thiếu dữ liệu hơn”, không
-gọi đã giảm nguy cơ quan sát. Nếu không có candidate cải thiện nguy cơ trong ngưỡng,
-trả fastest đầu (hoặc chỉ fastest) + no_lower_risk_within_budget; liệt kê constraint.
+“Cải thiện nguy cơ” được xác định bằng bộ ba
+`(highVeryHighMeters, routeRiskScore, missingMeters)` so theo thứ tự từ điển với
+bộ ba của tuyến nhanh nhất hợp lệ. Một tuyến trong ngưỡng thời gian cải thiện nếu
+bộ ba nhỏ hơn bộ ba của tuyến nhanh nhất; null score và lượng tử so sánh theo quy
+tắc phía trên. Nếu chỉ missingMeters tốt hơn, giải thích là “ít thiếu dữ liệu hơn”,
+không khẳng định đã giảm nguy cơ ngập quan sát. Chỉ khi không có tuyến nào cải thiện
+bộ ba trong ngưỡng mới hiển thị tuyến nhanh nhất đầu (hoặc chỉ tuyến đó) kèm
+no_lower_risk_within_budget; không được để fallback đảo ngược thứ tự theo missingMeters.
 Tất cả candidates cao thì all_routes_high; unknown bất kỳ thì incomplete_data;
 không có hỗ trợ tuyến nếu tất cả geometry bị loại. Không bao giờ thay NoRoute bằng
 đường thẳng. Chỉ hứa ưu tiên trong tập OSRM trả, không toàn graph, không cam kết an toàn.
@@ -155,9 +164,9 @@ History distance kiểm SQL thật, không lấy Euclidean lat/lon.
 | Q02 | Fastest1800s, alt2400/2401 | 2400 thuộc min2700,2400;2401 loại |
 | Q03 | A(high100m,score60,missing0,T600),B(high0,score70,missing0,T800) | B trước A dù score trung bình cao hơn |
 | Q04 | high bằng, score A40 B30 | B trước |
-| Q05 | high/score bằng, missing A100 B0, thời gian A500 B600 | B trước vì ít thiếu dữ liệu |
+| Q05 | highMeters/score bằng; A500s thiếu100m, B600s thiếu0m; ngưỡng750s | Cả hai trong ngưỡng; bộ ba B nhỏ hơn A nên B đứng trước, fallbackToFastest=false; giải thích ít thiếu dữ liệu hơn |
 | Q06 | high/score/missing bằng | thời gian nhỏ trước, rồi stableID |
-| Q07 | không candidate giảm tuple risk trong budget | fastest + cảnh báo, không gọi an toàn |
+| Q07 | không candidate giảm bộ ba highMeters/score/missingMeters trong budget | fastest + cảnh báo, không gọi an toàn |
 | Q08 | 1000m known score80 +1000m missing | routeScore80 trên phần biết, missing1000m, partial; không score40 |
 | Q09 | toàn tuyến unknown | score null, missing=total, cảnh báo; không score0 |
 | Q10 | endpoints trong nhưng giữa tuyến ngoài zone | discard toàn tuyến, không clip |

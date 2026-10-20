@@ -180,7 +180,7 @@ Thứ tự lát cắt US2 → US3 → US4 như plan; các unit tests có thể c
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T006`, `T009`, `T011`. **Truy vết**: FR-001, FR-006–FR-008, FR-017–FR-020; NFR-002; SC-002, SC-006, SC-008, SC-011, SC-012.
 
-  **Hoàn thành**: Fake nguồn mưa fresh/zero/stale/missing; kiểm đóng góp cộng dự phòng bất định khớp score, source dataTime khác fetchedAt, cùng input/version cùng kết quả. Insufficient_data trả200, score/level null, không giả low. Mismatch409, outside422 trước upstream, notice v2 và disclaimer bắt buộc. Đo click đến frame có đủ kết quả <=3s; RED trước T025/T026.
+  **Hoàn thành**: Fake nguồn mưa fresh/zero/stale/missing; kiểm đóng góp cộng dự phòng bất định khớp score, source dataTime khác fetchedAt, cùng input/version cùng kết quả. Insufficient_data trả200, score/level null, không giả low. Mismatch409, outside422 trước upstream, notice v2 và disclaimer bắt buộc. Đo click đến frame có đủ kết quả <=3s; RED trước T025/T026. Contract bắt buộc RiskResponse.weatherSnapshot dùng chung schema với weather response: thời điểm, nguồn, current/ba giờ dự báo và nhãn mode/scenario; risk dùng đúng snapshot trả về kể cả insufficient. RED ca US1 W1→cache hết hạn→risk W2: UI sau risk phải dùng W2, response W1 về muộn không được ghi đè.
 
 - [ ] T023 [P] [US3] GREEN — pure Risk calculator tại `backend/src/Flood.Api/Modules/Risk/Evaluate/RiskCalculator.cs`, `backend/src/Flood.Api/Modules/Risk/Evaluate/RiskExplanation.cs`.
 
@@ -192,19 +192,19 @@ Thứ tự lát cắt US2 → US3 → US4 như plan; các unit tests có thể c
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T018`, `T023`. **Truy vết**: FR-006–FR-008, FR-020; SC-002, SC-006, SC-008.
 
-  **Hoàn thành**: Batch facts trên tất cả điểm1km, coverageComplete mới cho H=0; severity/confidence không rõ phải thể hiện missing. Capture rule/zone/dataset snapshot; reviewedAt/reviewBy180ngày điều khiển stale quality. Weather seam có adapter fake/mô phỏng/LIVE; chưa có LIVE phải unavailable, không dữ liệu thật giả. Không truy cập DbSet module khác, không lưu point/yêu cầu người dùng.
+  **Hoàn thành**: Batch facts trên tất cả điểm1km, coverageComplete mới cho H=0; severity/confidence không rõ phải thể hiện missing. Capture rule/zone/dataset snapshot; reviewedAt/reviewBy180ngày điều khiển stale quality. Weather seam có adapter fake/mô phỏng/LIVE; chưa có LIVE phải unavailable, không dữ liệu thật giả. Không truy cập DbSet module khác, không lưu point/yêu cầu người dùng. Giữ nguyên WeatherSnapshot sau khi lấy dữ liệu cho toàn phép tính; chuyển chính giá trị đã dùng vào kết quả, không dựng lại từ cache hoặc cấp mã snapshot để lookup.
 
 - [ ] T025 [US3] GREEN — endpoint đánh giá tại `backend/src/Flood.Api/Modules/Risk/Evaluate/Endpoint.cs`.
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T022`, `T024`, `T009`, `T011`. **Truy vết**: FR-006–FR-008, FR-017–FR-020; SC-002, SC-006, SC-008, SC-011, SC-012.
 
-  **Hoàn thành**: Map POST risk/evaluate theo DTO/OpenAPI, no-store và guard notice v2/zone/rule trước I/O. Trả source/factor/interval/reserve/confidence/mode/version/checksum/disclaimer, core không phụ thuộc AI. Linked cancellation và log không có point/body/query/SQL params. T022 contract GREEN; fake external I/O không chứng minh SLA production.
+  **Hoàn thành**: Map POST risk/evaluate theo DTO/OpenAPI, no-store và guard notice v2/zone/rule trước I/O. Trả source/factor/interval/reserve/confidence/mode/version/checksum/disclaimer, core không phụ thuộc AI. Linked cancellation và log không có point/body/query/SQL params. T022 contract GREEN; fake external I/O không chứng minh SLA production. Trả kèm weatherSnapshot đầy đủ đúng đầu vào calculator theo schema dùng chung, kể cả unavailable với null rõ ràng; không mã snapshot/server lookup hoặc đọc lại cache để dựng response.
 
 - [ ] T026 [P] [US3] GREEN — risk card và bảng phân rã tại `apps/web/src/features/risk/RiskPanel.tsx`, `apps/web/src/features/risk/FactorBreakdown.tsx`.
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T022`, `T025`. **Truy vết**: FR-006–FR-008, FR-017; NFR-001; SC-002, SC-006, SC-012.
 
-  **Hoàn thành**: Hiển thị4mức hoặc trạng thái không đủ dữ liệu riêng, confidence, đóng góp và reserve, source/time/version, giải thích tiếng Việt và lưu ý tham khảo. Null không thành0 hoặc low. Chỉ fetch khi bấm qua coordinator, bỏ response cũ khi đổi điểm, không trình bày GPS stale như vị trí hiện tại đã xác nhận. Tests UI từ T022 GREEN.
+  **Hoàn thành**: Hiển thị4mức hoặc trạng thái không đủ dữ liệu riêng, confidence, đóng góp và reserve, source/time/version, giải thích tiếng Việt và lưu ý tham khảo. Null không thành0 hoặc low. Chỉ fetch khi bấm qua coordinator, bỏ response cũ khi đổi điểm, không trình bày GPS stale như vị trí hiện tại đã xác nhận. Tests UI từ T022 GREEN. Kết quả risk là nguồn mưa có thẩm quyền cho panel: nhận WeatherSnapshot nhúng để hiển thị current/ba giờ/source/time/mode và truyền cho chart dùng chung ở T040. Không ghép hoặc gọi weather endpoint riêng sau khi có risk; bỏ response weather độc lập trả muộn, giữ snapshot gắn đúng point/epoch.
 
 - [ ] T027 [US3] GATE US3 độc lập với nguồn weather trực tiếp tại `docs/validation/002/us3-risk.md`.
 
@@ -260,7 +260,7 @@ US1 kiểm thử độc lập bằng điểm trong vùng với nguồn thật sa
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T006`, `T009`, `T008`. **Truy vết**: FR-002, FR-003, FR-007, FR-020; NFR-002; SC-001, SC-008.
 
-  **Hoàn thành**: FakeHttpMessageHandler kiểm current.rain theo interval chuyển mm/h, không gọi model estimate là đo tại trạm. Trả đúng3giờ trọn tiếp theo, UTC nội bộ/Asia_Ho_Chi_Minh hiển thị; zero khác null, invalid/negative/NaN là thiếu. Timeout1.5s tổng, không retry; current valid age>30phút là missing, thiếu1giờ =>Fmissing; không bịa modelRunTime. RED trước T037.
+  **Hoàn thành**: FakeHttpMessageHandler kiểm current.rain theo interval chuyển mm/h, không gọi model estimate là đo tại trạm. Trả đúng3giờ trọn tiếp theo, UTC nội bộ/Asia_Ho_Chi_Minh hiển thị; zero khác null, invalid/negative/NaN là thiếu. Timeout1.5s tổng, không retry; current valid age>30phút là missing, thiếu1giờ =>Fmissing; không bịa modelRunTime. RED trước T037. RED hợp đồng WeatherSnapshot dùng chung: capturedAt/source dataTime/fetchedAt, current/ba slot, status/quality và mode/scenario; WeatherResponse.weatherSnapshot cho US1 và RiskResponse.weatherSnapshot dùng cùng cấu trúc, không snapshot ID.
 
 - [ ] T035 [P] [US1] RED — weather cache, quota và degraded fallback tại `backend/tests/Flood.UnitTests/Weather/WeatherCacheTests.cs`, `backend/tests/Flood.UnitTests/Weather/WeatherBudgetTests.cs`.
 
@@ -290,19 +290,19 @@ US1 kiểm thử độc lập bằng điểm trong vùng với nguồn thật sa
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T011`, `T037`, `T038`. **Truy vết**: FR-001–FR-003, FR-018–FR-020; SC-001, SC-008, SC-010, SC-011.
 
-  **Hoàn thành**: POST weather/at-point, guard notice v2/ST_Covers/versions trước HTTP, no-store. LiveEnabled chỉ bật khi spike C/terms/notice/redaction đã kiểm chứng; disabled trả503 rõ, không empty success. Simulation resolve preset trước LIVE adapter, không upstream call. Response available/degraded/unavailable có source/time/mode; T034 contract GREEN, lỗi nguồn không chặn map/risk độc lập.
+  **Hoàn thành**: POST weather/at-point, guard notice v2/ST_Covers/versions trước HTTP, no-store. LiveEnabled chỉ bật khi spike C/terms/notice/redaction đã kiểm chứng; disabled trả503 rõ, không empty success. Simulation resolve preset trước LIVE adapter, không upstream call. Response available/degraded/unavailable có source/time/mode; T034 contract GREEN, lỗi nguồn không chặn map/risk độc lập. WeatherResponse trả weatherSnapshot theo schema dùng chung; frontend chỉ gọi endpoint này cho US1 khi chưa tính risk, không dùng nó để giải thích risk/route đã có.
 
 - [ ] T040 [P] [US1] RED→GREEN — biểu đồ mưa3giờ và trạng thái nguồn tại `tests/e2e/weather.spec.ts`, `apps/web/src/features/weather/WeatherPanel.tsx`, `apps/web/src/features/weather/HourlyRainChart.tsx`.
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T039`, `T031`. **Truy vết**: FR-002, FR-003, FR-009, FR-017; NFR-001, NFR-002; SC-001, SC-008, SC-009, SC-012.
 
-  **Hoàn thành**: Chạy RED UI rồi cài Recharts lazy-load: current rate/interval,3giờ rain mm, nguồn model estimate, dataTime/fetchedAt, attribution Open-Meteo và license. Zero/missing/stale có nhãn riêng, giữ banner và nhãn mô phỏng. Mobile360px, fetch chỉ khi click qua coordinator, không chart dữ liệu giả. Tests GREEN.
+  **Hoàn thành**: Chạy RED UI rồi cài Recharts lazy-load: current rate/interval,3giờ rain mm, nguồn model estimate, dataTime/fetchedAt, attribution Open-Meteo và license. Zero/missing/stale có nhãn riêng, giữ banner và nhãn mô phỏng. Mobile360px, fetch chỉ khi click qua coordinator, không chart dữ liệu giả. Tests GREEN. Chart/WeatherPanel nhận WeatherSnapshot qua props: trước risk lấy WeatherResponse.weatherSnapshot, sau risk bắt buộc lấy RiskResponse.weatherSnapshot. RED rồi GREEN ca W1→cache hết hạn→risk W2 và W1 trả muộn: số mưa, giờ, nguồn, chất lượng và nhãn phải khớp W2; không tự gọi endpoint mưa khi đã có risk.
 
 - [ ] T041 [US1] Nối LIVE weather vào Risk snapshot, kiểm suy giảm độc lập tại `backend/tests/Flood.IntegrationTests/Risk/LiveWeatherIntegrationTests.cs`, `backend/src/Flood.Api/Modules/Risk/Evaluate/RiskSnapshotBuilder.cs`.
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T027`, `T039`, `T040`. **Truy vết**: FR-002, FR-003, FR-006–FR-008, FR-020; SC-001, SC-002, SC-006, SC-008.
 
-  **Hoàn thành**: RED integration trước khi nối LIVE adapter vào seam: weather/risk dùng snapshot nhất quán, source time/quality/version tương ứng. Cache cold/warm, source error/stale, history missing/coverage thiếu phải giảm confidence hoặc insufficient, không low giả. Lỗi một nguồn không chặn history/map; simulation không HTTP. GREEN rồi refactor, không tuyên bố độ chính xác thực địa.
+  **Hoàn thành**: RED integration trước khi nối LIVE adapter vào seam: weather/risk dùng snapshot nhất quán, source time/quality/version tương ứng. Cache cold/warm, source error/stale, history missing/coverage thiếu phải giảm confidence hoặc insufficient, không low giả. Lỗi một nguồn không chặn history/map; simulation không HTTP. GREEN rồi refactor, không tuyên bố độ chính xác thực địa. Chạy RED rồi GREEN cache hết hạn giữa hai lời gọi: US1 trả W1, risk tính bằng W2 và trả W2 trong weatherSnapshot; UI mưa/chart theo W2, không ghép W1 hoặc dữ liệu fetch sau đó. Calculator và serializer dùng chính snapshot bất biến đã chụp; không snapshot ID lưu/lookup RAM. Đo lại response/time/mode/quality và cả case weather W1 trả muộn.
 
 - [ ] T042 [US1] Đo thời tiết/risk thật và privacy trace đã redaction tại `tests/performance/weather-risk-benchmark.ts`, `docs/validation/002/weather-risk-performance.md`.
 
@@ -332,13 +332,13 @@ US5 bắt buộc cho MVP dù story Priority P2. Ranker/segment tests dùng oracl
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T006`, `T008`. **Truy vết**: FR-011–FR-013, FR-017; NFR-003; SC-003, SC-006, SC-012.
 
-  **Hoàn thành**: RED các ca Q01–Q09: eligible<=min(1.5Tfastest,Tfastest+600s), đúng/vượt900/901 và2400/2401. Thứ tự highMeters→riskScore→missingMeters→durationMs→stableID. All-unknown score=null, comparator nội bộ null sau số có giá trị, không serialize Infinity. Lượng tử cố định mét2chữ số/score6chữ số; không comparator epsilon mất bắc cầu. Fallback fastest và all-high có cảnh báo.
+  **Hoàn thành**: RED các ca Q01–Q09: eligible<=min(1.5Tfastest,Tfastest+600s), đúng/vượt900/901 và2400/2401. Thứ tự highMeters→riskScore→missingMeters→durationMs→stableID. All-unknown score=null, comparator nội bộ null sau số có giá trị, không serialize Infinity. Lượng tử cố định mét2chữ số/score6chữ số; không comparator epsilon mất bắc cầu. Fallback fastest và all-high có cảnh báo. Kiểm “cải thiện nguy cơ” bằng bộ ba (highVeryHighMeters, routeRiskScore, missingMeters) theo thứ tự từ điển so với fastest. Ca bắt buộc: A500s thiếu100m, B600s thiếu0m, cùng highMeters/score, ngưỡng750s; B đứng trước và fallbackToFastest=false. Chỉ khi không bộ ba nào tốt hơn mới fastest+cảnh báo.
 
 - [ ] T046 [P] [US5] RED — chia đoạn/batch geography và ngân sách upstream tại `backend/tests/Flood.IntegrationTests/SmartRoute/SegmentRiskTests.cs`, `backend/tests/Flood.UnitTests/SmartRoute/RouteWeatherBudgetTests.cs`.
 
   **Cỡ**: L. **Người phụ trách**: . **Phụ thuộc**: `T006`, `T008`, `T023`, `T018`. **Truy vết**: FR-006–FR-008, FR-011–FR-013; NFR-002, NFR-003; SC-003, SC-006, SC-008, SC-010.
 
-  **Hoàn thành**: RED kiểm geography segments<=50m, endpoint/midpoint lấy max score; bất kỳ sample insufficient =>segment missing. Aggregate phần known, toàn missing=null, known+missing=total trong1cm; không unknown0. Batch toàn bộ history facts, tối đa12weather cells/set,4calls đồng thời/deadline tổng1.5s; cap3000segments/set,50km/route. Vượt cap422, không âm thầm bỏ mẫu. Không dùng evidence điểm cho cả tuyến.
+  **Hoàn thành**: RED kiểm geography segments<=50m, endpoint/midpoint lấy max score; bất kỳ sample insufficient =>segment missing. Aggregate phần known, toàn missing=null, known+missing=total trong1cm; không unknown0. Batch toàn bộ history facts, tối đa12weather cells/set,4calls đồng thời/deadline tổng1.5s; cap3000segments/set,50km/route. Vượt cap422, không âm thầm bỏ mẫu. Không dùng evidence điểm cho cả tuyến. RED snapshot mưa tuyến: một snapshot bất biến/ô trong request kể cả cache hết hạn giữa samples, response chứa đầy đủ các snapshot đã dùng. Segment weatherSnapshotIndexes luôn đúng và trong bounds mảng payload; UI không lấy lại mưa mới để giải thích risk cũ.
 
 - [ ] T047 [P] [US5] RED — UI tuyến và giải thích tại `tests/e2e/routes.spec.ts`.
 
@@ -362,31 +362,31 @@ US5 bắt buộc cho MVP dù story Priority P2. Ranker/segment tests dùng oracl
 
   **Cỡ**: L. **Người phụ trách**: . **Phụ thuộc**: `T046`, `T041`, `T049`. **Truy vết**: FR-006–FR-008, FR-011, FR-012; SC-003, SC-006, SC-008, SC-010.
 
-  **Hoàn thành**: Cài sampling/budget/caps theo T046 và rule version; batch SQL facts, không roundtrip cho từng sample, weather reuse rounded cell thay vì gọi mỗi segment. Simulation bypass provider, snapshot cố định, unknown không0. Aggregate known-length hoặc null, trả coverage/missing length và bốn số liệu; evidenceApplied=false. T046 GREEN, công bố sampling có thể bỏ sót hotspot nhỏ.
+  **Hoàn thành**: Cài sampling/budget/caps theo T046 và rule version; batch SQL facts, không roundtrip cho từng sample, weather reuse rounded cell thay vì gọi mỗi segment. Simulation bypass provider, snapshot cố định, unknown không0. Aggregate known-length hoặc null, trả coverage/missing length và bốn số liệu; evidenceApplied=false. T046 GREEN, công bố sampling có thể bỏ sót hotspot nhỏ. Capture mỗi ô một WeatherSnapshot trong request và chuyển đúng snapshot đó ra response catalog, kể cả ô unavailable. Cache hết hạn không thay snapshot giữa samples; nối segment weatherSnapshotIndexes vào catalog payload, không server snapshot store/lookup.
 
 - [ ] T051 [P] [US5] GREEN — ranker thuần và cảnh báo fastest fallback tại `backend/src/Flood.Api/Modules/SmartRoute/Ranking/RouteRanker.cs`, `backend/src/Flood.Api/Modules/SmartRoute/Ranking/RouteWarnings.cs`.
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T045`. **Truy vết**: FR-011–FR-013, FR-017; NFR-003; SC-003, SC-006, SC-012.
 
-  **Hoàn thành**: Tfastest trong ứng viên hợp lệ; lọc duration rồi xếp tuple đã chốt. Không có cải thiện hai tiêu chí nguy cơ trong budget thì fastest+cảnh báo; ít missing chỉ giải thích là ít thiếu dữ liệu, không gọi đã giảm nguy cơ quan sát. Giữ bốn số liệu, unknown/all-high/disclaimer; không Infinity JSON. T045 GREEN/refactor, không hứa tối ưu toàn graph.
+  **Hoàn thành**: Tfastest trong ứng viên hợp lệ; lọc duration rồi xếp tuple đã chốt. Cải thiện so với fastest trên bộ ba (highVeryHighMeters, routeRiskScore, missingMeters) theo thứ tự từ điển, chỉ trong ngưỡng thời gian. Chỉ khi không tuyến nào có bộ ba tốt hơn mới hiển thị fastest+cảnh báo; nếu chỉ missing tốt hơn, giải thích ít thiếu dữ liệu, không khẳng định nguy cơ ngập quan sát đã giảm. Ca A500s thiếu100m/B600s thiếu0m cùng highMeters/score, ngưỡng750s phải cho B đứng trước, fallbackToFastest=false; case ba tiêu chí không cải thiện mới fallback. Giữ bốn số liệu, unknown/all-high/disclaimer; không Infinity JSON. T045 GREEN/refactor, không hứa tối ưu toàn graph.
 
 - [ ] T052 [US5] GREEN — route slice và cancellation deadline tại `backend/src/Flood.Api/Modules/SmartRoute/FindRoutes/Endpoint.cs`, `backend/src/Flood.Api/Modules/SmartRoute/FindRoutes/Handler.cs`.
 
   **Cỡ**: L. **Người phụ trách**: . **Phụ thuộc**: `T009`, `T011`, `T049`, `T050`, `T051`. **Truy vết**: FR-001, FR-011–FR-013, FR-017–FR-020; NFR-002; SC-003, SC-005, SC-008–SC-012.
 
-  **Hoàn thành**: POST routes/search, JSON16KiB/no-store/version/notice v2 trước I/O. Orchestrate OSRM→snapshots batch→ranking, trả source/mode/rule checksum/dataset/zone/graph/profile. API hard deadline4.3s, browser5s, linked cancellation và không background request. Mô phỏng provider calls=0, kiểm lại T028. Error dùng ProblemDetails001; không straight-line giả, không lưu OD/request history.
+  **Hoàn thành**: POST routes/search, JSON16KiB/no-store/version/notice v2 trước I/O. Orchestrate OSRM→snapshots batch→ranking, trả source/mode/rule checksum/dataset/zone/graph/profile. API hard deadline4.3s, browser5s, linked cancellation và không background request. Mô phỏng provider calls=0, kiểm lại T028. Error dùng ProblemDetails001; không straight-line giả, không lưu OD/request history. Trả RouteResponse.weatherSnapshots tối đa12 ô với toàn bộ source/time/current/hourly/mode và chỉ số segment tham chiếu đúng mảng response. Không dựng lại snapshot từ cache sau tính toán; không mã snapshot lookup máy chủ.
 
 - [ ] T053 [US5] GREEN — hiển thị tuyến trên map và thẻ so sánh tại `apps/web/src/features/routing/RouteLayer.tsx`, `apps/web/src/features/routing/RouteCards.tsx`, `apps/web/src/features/routing/RouteSearch.tsx`.
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T047`, `T052`, `T031`. **Truy vết**: FR-011–FR-013, FR-017, FR-019; SC-003, SC-005, SC-008–SC-012.
 
-  **Hoàn thành**: Chỉ request sau click/consent, bỏ kết quả OD cũ. Hiển thị high/unknown segments, bốn số liệu, coverage, nguồn, giải thích xếp hạng/time budget và profile car-reference. Banner/nhãn mô phỏng và disclaimer luôn đúng; score null hiện không đủ dữ liệu. T047 GREEN trên360px, banner không che CTA; API lỗi không chặn map/history.
+  **Hoàn thành**: Chỉ request sau click/consent, bỏ kết quả OD cũ. Hiển thị high/unknown segments, bốn số liệu, coverage, nguồn, giải thích xếp hạng/time budget và profile car-reference. Banner/nhãn mô phỏng và disclaimer luôn đúng; score null hiện không đủ dữ liệu. T047 GREEN trên360px, banner không che CTA; API lỗi không chặn map/history. Mưa/biểu đồ trong chi tiết tuyến/đoạn chỉ dùng RouteResponse.weatherSnapshots được segment tham chiếu, không fetch lại weather. Biểu đồ điểm risk giữ RiskResponse.weatherSnapshot của điểm đó, không bị ô tuyến khác ghi đè.
 
 - [ ] T054 [US5] E2E bắt buộc demo mô phỏng→risk→route tại `tests/e2e/demo-simulation-risk-route.spec.ts`, `docs/validation/002/demo-route-e2e.md`.
 
   **Cỡ**: M. **Người phụ trách**: . **Phụ thuộc**: `T033`, `T043`, `T053`. **Truy vết**: FR-006–FR-013, FR-017–FR-020; NFR-001–NFR-003; SC-002, SC-003, SC-005, SC-008–SC-012.
 
-  **Hoàn thành**: Chạy Chromium/WebKit luồng consent→preset→risk→tuyến; tests T028/T047 phải RED trước GREEN. History/zone/map thật,1–3OSRMcandidates hợp lệ, không ngoài vùng, không weather outbound khi mô phỏng. Đổi/tắt/reload/tab đồng thời không lẫn mode; all-high/unknown/no-route/no-improvement/API lỗi có cảnh báo. Kết quả browser mocks không thay kiểm điện thoại thật.
+  **Hoàn thành**: Chạy Chromium/WebKit luồng consent→preset→risk→tuyến; tests T028/T047 phải RED trước GREEN. History/zone/map thật,1–3OSRMcandidates hợp lệ, không ngoài vùng, không weather outbound khi mô phỏng. Đổi/tắt/reload/tab đồng thời không lẫn mode; all-high/unknown/no-route/no-improvement/API lỗi có cảnh báo. Kết quả browser mocks không thay kiểm điện thoại thật. Hồi quy hết hạn cache giữa weather W1/risk W2 và sau đánh giá route: chart điểm dùng W2, chi tiết tuyến dùng snapshot đã tính tuyến; response weather cũ không ghi đè. Network không có weather request bổ sung để tái dựng lời giải thích.
 
 - [ ] T055 [US5] Đo tuyến end-to-end cold/warm và quota giới hạn tại `tests/performance/route-benchmark.ts`, `docs/validation/002/route-performance.md`.
 

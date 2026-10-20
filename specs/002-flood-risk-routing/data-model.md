@@ -152,6 +152,22 @@ SupportZone(ST_Covers) không áp dung sai1mm radius, giữ nguyên contract bi�
 GeoPandas/Python chỉ script offline, lock packages và image CI; worker Florence dùng
 lockfile riêng. GeoJSON là nhóm cung cấp/bản đã chuẩn hoá, không output mock production.
 
+## Snapshot thời tiết trong response
+
+`WeatherSnapshot` là giá trị bất biến đã dùng tính toán, không phải bảng hoặc mã
+snapshot tra cứu máy chủ: capturedAt, source với dataTime/fetchedAt, current rate/
+interval/validTime, ba giờ dự báo, trạng thái/chất lượng và mode/scenarioId.
+`RiskResponse.weatherSnapshot` trả đầy đủ giá trị đó; UI mưa/biểu đồ sau risk chỉ
+dùng payload này. `WeatherResponse.weatherSnapshot` dùng cùng schema cho US1 trước
+khi tính risk. Cache hết hạn giữa hai lời gọi không làm UI ghép mưa cũ với risk mới.
+
+`RouteResponse.weatherSnapshots` chứa tối đa12 ô mưa đã dùng; mỗi phần tử có rounded
+cell và WeatherSnapshot, kể cả snapshot unavailable với các giá trị thiếu rõ ràng.
+`RouteSegment.weatherSnapshotIndexes` tham chiếu các phần tử ngay trong mảng response,
+không tạo kho/mã snapshot ở RAM hoặc DB. Cùng một ô dùng cùng snapshot trong request.
+UI chi tiết tuyến dùng chính payload tuyến; không gọi lại weather endpoint để giải
+thích bằng mưa khác. Snapshot chỉ trong RAM request/response tab, no-store và không log.
+
 ## Ephemeral state và lifecycle
 
 | Dữ liệu | Nơi sống | Hết hiệu lực |

@@ -93,6 +93,12 @@ UI không trình bày ảnh đang hoạt động; tests ảnh không được gh
 
 ## Spike và báo cáo
 
+Hồi quy snapshot: gọi US1 nhận W1, làm cache hết hạn rồi gọi risk nhận W2. Sau risk,
+UI mưa/biểu đồ phải khớp `RiskResponse.weatherSnapshot=W2`, không W1 hoặc lần fetch
+khác; thử W1 trả muộn. Với route, làm cache đổi sau khi chấm tuyến rồi kiểm UI đoạn
+vẫn đọc `RouteResponse.weatherSnapshots` và các chỉ số trong response, không gọi
+lại nguồn để giải thích. Không mã snapshot hoặc kho lookup ở máy chủ.
+
 Trước milestones tính năng: báo cáo Florence CPU/GPU, OSRM graph/RAM/E2E, OpenMeteo
 latency/terms/privacy. Ghi machine/SKU/region/date/version/command, cold/warm,
 p50/p95/max/raw duration, exceptions/quota, PASS/FAIL/BLOCKED. Dữ liệu cá nhân không

@@ -1,5 +1,5 @@
 {
-  "version": "risk-v1.0.0",
+  "version": "risk-v1.0.1",
   "status": "design-not-field-calibrated",
   "weather": {
     "forecastHours": 3,
@@ -116,7 +116,7 @@
       "durationMilliseconds",
       "stableCandidateId"
     ],
-    "riskImprovement": "lexicographic(highVeryHighMeters,routeRiskScore) against fastest eligible candidate",
+    "riskImprovement": "lexicographic(highVeryHighMeters,routeRiskScore,missingMeters) against fastest eligible candidate; null score sorts after numeric scores",
     "fallback": "fastest_with_warning_if_no_lower_risk_candidate_in_time_budget",
     "comparisonMetersDecimals": 2,
     "comparisonScoreDecimals": 6

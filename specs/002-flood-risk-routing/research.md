@@ -42,7 +42,21 @@ current.interval cho phép chuyển rate. Phạm vi dữ liệu do model quyết
 suy ra đo chính xác trên từng đoạn đường. [Forecast API](https://open-meteo.com/en/docs).
 
 **Rationale**: Giảm call/PII gửi bên ngoài nhưng vẫn giữ nhãn sai số/nguồn; RAM không
-cần Redis cho20người. Forecast chart Recharts từ cùng snapshot Risk dùng.
+cần Redis cho20người. `RiskResponse.weatherSnapshot` trả nguyên snapshot thời tiết
+đã dùng, gồm thời điểm, nguồn, current/ba giờ dự báo, chất lượng và mode/scenario.
+Sau kết quả risk, UI hiển thị mưa và vẽ Recharts chỉ từ snapshot này. Endpoint mưa
+riêng chỉ phục vụ US1 khi chưa tính risk; không ghép response mưa độc lập vào risk.
+Không dùng mã snapshot để lưu/tra cứu tại máy chủ. Cache weather cell hiện có vẫn
+được dùng khi lấy dữ liệu, nhưng hết hạn cache không đổi snapshot đã gắn với response.
+Test gọi US1 lấy W1, để cache hết hạn rồi tính risk bằng W2: biểu đồ sau risk phải
+dùng W2; W1 trả muộn hoặc cache đổi tiếp cũng không được ghi đè.
+
+Routing áp dụng cùng nguyên tắc: `RouteResponse.weatherSnapshots` chứa các snapshot
+ô mưa thật sự đã dùng trong request; mỗi segment có `weatherSnapshotIndexes` trỏ
+vào mảng ngay trong response đó. Đây chỉ là vị trí phần tử của payload, không phải
+mã tra cứu hoặc state snapshot ở máy chủ. UI chi tiết tuyến/đoạn lấy mưa từ payload
+tuyến, không gọi endpoint mưa để dựng lại bằng dữ liệu mới. Biểu đồ điểm risk vẫn
+dùng RiskResponse của điểm đó, không tự đổi sang ô mưa của tuyến.
 **Alternatives**: gọi mỗi GPSfix hoặc mỗi50msegment gây thừa call, trái consent/SLA;
 lưu request cacheDB tạo lịch sử vị trí ngoài scope; background refresh không cần.
 

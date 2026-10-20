@@ -1,11 +1,11 @@
 {
   "artifactKind": "design-rule-bundle",
-  "ruleVersion": "risk-v1.0.0",
+  "ruleVersion": "risk-v1.0.1",
   "files": [
     {
       "path": "risk-rules-v1.json",
-      "sha256": "e958ca2f2304deb7cd5b06160f7a22887968db4e84170eaae29ed9aef52fd99f",
-      "bytes": 3851
+      "sha256": "af86bd2382a0b089d989f0e7a30d7a25d4353dbf5ad4eb626709852922902b0d",
+      "bytes": 3904
     }
   ],
   "activation": "implementation must validate and copy immutable bundle before activation"

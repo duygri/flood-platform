@@ -165,6 +165,12 @@ không đưa kết quả mô phỏng vào cache thật hoặc lịch sử.
 ## Bộ quy tắc, lịch sử và weather
 
 Chi tiết có tính quyết định ở [risk-rules.md](risk-rules.md), [data-model.md](data-model.md).
+`RiskResponse.weatherSnapshot` chứa đầy đủ snapshot thời tiết đã dùng: source,
+dataTime/fetchedAt/capturedAt, current/ba giờ dự báo, chất lượng và mode/scenario.
+Sau risk, UI mưa/biểu đồ lấy từ payload này; endpoint weather riêng chỉ dùng US1
+trước khi tính risk. Cache hết hạn giữa hai lời gọi không được làm lệch biểu đồ
+so với đầu vào risk; response weather độc lập trả muộn không ghi đè snapshot risk.
+Không có mã snapshot lưu/tra cứu máy chủ, không thay cache weather-cell hiện có.
 File cấu hình/manifest SHA256 được kiểm exact bytes; đổi bất kỳ giá trị có ý nghĩa
 phải đổi version. Capture snapshot bất biến đầu request; mismatch 409, không trộn
 rule/zone/dataset khi deploy. Mô hình là heuristic demo, chưa hiệu chuẩn dự báo ngập.
@@ -214,8 +220,10 @@ ra ngoài; tất cả ngoài trả422 route_outside_support_zone, UI vẫn có c
 Tuyến nhanh nhất là nhanh nhất trong các ứng viên hợp lệ còn lại. Ngưỡng eligible
 `duration <= min(1.5*Tfastest,Tfastest+600s)`; đúng ngưỡng được tính. Thứ tự tăng dần:
 `highVeryHighMeters, routeRiskScore, missingMeters, durationSeconds`, stable tie ID.
-“Ít nguy cơ hơn” là bộ đôi đầu nhỏ hơn theo thứ tự so với tuyến nhanh nhất trong tập;
-không có cải thiện trong ngưỡng thì trả tuyến nhanh nhất + no_lower_risk_within_budget.
+“Cải thiện nguy cơ” là bộ ba `(highVeryHighMeters, routeRiskScore, missingMeters)`
+nhỏ hơn theo thứ tự từ điển so với tuyến nhanh nhất hợp lệ. Chỉ khi không tuyến nào
+trong ngưỡng cải thiện bộ ba mới trả tuyến nhanh nhất + no_lower_risk_within_budget.
+Khi chỉ ít thiếu dữ liệu hơn, nêu đúng lý do đó; không khẳng định ngập quan sát đã giảm.
 Giữ cảnh báo all_routes_high, unknown_data và disclaimer. Không gọi thấp là chắc chắn an toàn.
 
 Segment geography<=50m, midpoint + hai endpoints, lấy nguy cơ lớn nhất các mẫu đủ
@@ -226,6 +234,11 @@ hạn trả422 route_evaluation_limit, không bỏ mẫu âm thầm hoặc đán
 Một batch weather tối đa12ô với cap4song song và hard deadline1,5s tổng; không gọi
 per-segment. Chưa lấy được ô trước deadline là thiếu dữ liệu, trả độ dài missing.
 Chi tiết aggregate/unknown/null tại risk-rules.md; không thay unknown bằng0.
+RouteResponse trả `weatherSnapshots` của các ô đã dùng, gồm cả ô unavailable;
+`RouteSegment.weatherSnapshotIndexes` chỉ tham chiếu vị trí trong chính mảng response.
+UI giải thích mưa theo đoạn/tuyến dùng các giá trị này, không lấy lại weather mới
+hoặc thay biểu đồ điểm risk bằng một ô tuyến khác. Tối đa12 ô như giới hạn hiện có;
+đây không phải mã snapshot hay state mới ở máy chủ.
 
 Budget thiết kế end-to-end: network+UI500ms, OSRM1500ms, weather/history1500ms,
 risk/rank500ms, serialize300ms, margin700ms =5000ms. History facts và weather có thể

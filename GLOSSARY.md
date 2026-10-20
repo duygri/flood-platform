@@ -56,6 +56,7 @@ không làm dữ liệu lịch sử ngập, bản đồ hoặc vùng hỗ trợ 
 _Avoid_: Mưa quan trắc
 
 **Tuyến ít nguy cơ hơn**:
-Tuyến được ưu tiên trong các ứng viên đủ điều kiện nhờ ít đoạn cao/rất cao hơn,
-rồi rủi ro tổng thấp hơn; dữ liệu thiếu vẫn được công bố, không bảo đảm an toàn.
+Tuyến có bộ ba tổng chiều dài đoạn cao/rất cao, rủi ro tổng, chiều dài thiếu dữ liệu
+nhỏ hơn theo thứ tự từ điển so với tuyến nhanh nhất trong ngưỡng thời gian cho phép;
+nếu chỉ ít thiếu dữ liệu hơn thì nêu đúng lý do đó, không bảo đảm an toàn.
 _Avoid_: Tuyến ít ngập nhất toàn mạng đường
