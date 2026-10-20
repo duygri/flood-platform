@@ -1,0 +1,16 @@
+{
+  "name": "flood-map-web-harness",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "harness:serve": "node ../../tests/e2e/harness/server.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:harness": "playwright test harness.spec.ts",
+    "test:red": "playwright test map.spec.ts",
+    "test:e2e": "playwright test"
+  }
+}

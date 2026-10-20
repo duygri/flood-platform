@@ -1,0 +1,13 @@
+**/node_modules
+**/bin
+**/obj
+**/test-results
+**/test-reports
+**/playwright-report
+**/.next
+.git
+**/.env
+**/.env.*
+**/*.key
+**/*.pem
+secrets
