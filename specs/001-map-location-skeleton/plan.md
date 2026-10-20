@@ -246,7 +246,13 @@ hiển thị thời điểm cuối. Một banner có thể liệt kê đồng th
 FR-008 (không gửi GPS khi chưa consent) được giữ: anonymous/local check dùng đa giác
 GeoJSON tải về; điểm ngoài biên kiểm tra client có thể sai số số học nên server là
 thẩm quyền khi ghi. Public POST check-point chỉ nhận điểm thủ công/fixture;
-GPS thật chỉ gửi tới check/record sau consent. Không tự gọi server check cho anonymous GPS.
+Trong phạm vi spec 001, GPS thật chỉ gửi tới check/record sau đồng ý lưu lịch sử
+và đủ điều kiện ghi; không có luồng gửi GPS của người ẩn danh, không tự gọi server
+check cho anonymous GPS. Ngoại lệ chỉ khi spec 002 được triển khai: yêu cầu xử lý
+tạm do người dùng chủ động đồng ý theo spec 002 FR-019 (ứng dụng không lưu vị trí
+chính xác/không ghi log tọa độ; Open-Meteo có thể giữ log tọa độ làm tròn tối đa
+90 ngày theo notice v2), độc lập với đồng ý lưu lịch sử; chỉ gửi khi bấm yêu cầu, theo dõi GPS
+không tự gửi vị trí mới.
 Client kiểm tra cả biên, không snap/buffer/làm mượt. Ngoài vùng không lưu; dao động
 sát biên chấp nhận trong MVP, thông báo không khẳng định toàn TP.HCM đã được phủ.
 

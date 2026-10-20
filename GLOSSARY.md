@@ -35,3 +35,27 @@ _Avoid_: Vị trí đang theo dõi chính xác
 **Điểm ngập seed**:
 Điểm tham chiếu trong dữ liệu demo để kiểm tra vùng bao phủ, chưa phải kết luận ngập hiện tại.
 _Avoid_: Cảnh báo ngập thời gian thực
+
+**Đồng ý xử lý tạm**:
+Lựa chọn cho phép gửi điểm sau thao tác yêu cầu để lấy thông tin trong phiên tab;
+không cho phép lưu lịch sử và không làm theo dõi vị trí tự gửi các điểm mới.
+_Avoid_: Đồng ý lưu lịch sử, quyền GPS
+
+**Rủi ro ngập tham khảo**:
+Đánh giá theo quy tắc công bố, có nguồn, độ tin cậy và giải thích các yếu tố;
+không phải cảnh báo chính thức hoặc bảo đảm an toàn.
+_Avoid_: Xác suất ngập đã kiểm định, tuyến an toàn tuyệt đối
+
+**Không đủ dữ liệu**:
+Trạng thái chưa đủ bằng chứng để kết luận mức rủi ro; khác mức thấp hoặc mưa bằng không.
+_Avoid_: Không có nguy cơ
+
+**Mưa mô phỏng**:
+Mưa từ kịch bản có tên dùng cho trình bày, phân biệt rõ với mưa thật;
+không làm dữ liệu lịch sử ngập, bản đồ hoặc vùng hỗ trợ thành dữ liệu mô phỏng.
+_Avoid_: Mưa quan trắc
+
+**Tuyến ít nguy cơ hơn**:
+Tuyến được ưu tiên trong các ứng viên đủ điều kiện nhờ ít đoạn cao/rất cao hơn,
+rồi rủi ro tổng thấp hơn; dữ liệu thiếu vẫn được công bố, không bảo đảm an toàn.
+_Avoid_: Tuyến ít ngập nhất toàn mạng đường

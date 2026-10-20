@@ -113,7 +113,10 @@ lựa chọn để lưu và quản lý lịch sử vị trí của chính mình.
 **Acceptance Scenarios**:
 
 1. **Given** chưa đăng nhập hoặc chưa bật lưu, **When** dùng GPS,
-   **Then** không gửi tọa độ GPS lên máy chủ ứng dụng hoặc lưu bền vững.
+   **Then** không gửi tọa độ GPS lên máy chủ ứng dụng hoặc lưu bền vững, trừ yêu cầu
+   xử lý tạm do người dùng chủ động đồng ý theo spec 002 (ứng dụng không lưu vị trí
+   chính xác/không ghi log tọa độ; Open-Meteo có thể giữ log tọa độ làm tròn tối đa
+   90 ngày theo notice v2), độc lập với đồng ý lưu lịch sử.
 2. **Given** đã đăng nhập, **When** bật rõ ràng việc lưu,
    **Then** chỉ lưu tọa độ GPS, độ chính xác và thời điểm gắn với tài khoản;
    điểm thủ công không được lưu. Quyền GPS không thay cho đồng ý lưu.
@@ -198,7 +201,22 @@ Người vận hành kiểm tra được trạng thái và tìm được lỗi k
   tối đa 15 phút; đây là giới hạn đã biết, không được báo đã thu hồi phiên máy chủ.
   Lịch sử chỉ được xem và xoá bởi chủ tài khoản (US5; truy vết T027, T037).
 - **FR-008**: Mặc định chỉ xử lý GPS trong bộ nhớ phiên. Chỉ khi đăng nhập và bật lưu
-  rõ ràng mới gửi/lưu tọa độ GPS, độ chính xác, thời điểm gắn với tài khoản.
+  rõ ràng mới gửi/lưu tọa độ GPS, độ chính xác, thời điểm gắn với tài khoản cho lịch sử.
+  Không gửi GPS ngoài luồng lịch sử, trừ yêu cầu xử lý tạm do người dùng chủ động
+  đồng ý theo spec 002 (ứng dụng không lưu vị trí chính xác/không ghi log tọa độ;
+  Open-Meteo có thể giữ log tọa độ làm tròn tối đa 90 ngày theo notice v2), độc lập với đồng ý lưu
+  lịch sử. Ngoại lệ giới hạn tại spec 002 FR-019: cả người ẩn danh/đã đăng nhập được gửi điểm
+  GPS hoặc chọn tay để xử lý tạm sau đồng ý một lần trong phiên tab, chỉ giữ trong
+  bộ nhớ, hết hiệu lực khi tải lại/đóng tab. Thông báo nêu rõ điểm được gửi, bên nhận
+  là máy chủ ứng dụng và Open-Meteo; ứng dụng chỉ xử lý tạm, không lưu vị trí chính
+  xác theo ngoại lệ này. Open-Meteo chỉ nhận tọa độ làm tròn theo ô 0,01 độ và có thể
+  giữ log yêu cầu chứa tọa độ đó tối đa 90 ngày theo chính sách được liên kết trong
+  notice `temporary-processing-v2`; không chuyển tài khoản/token/IP thiết bị đến họ.
+  Cache thời tiết ô làm tròn chỉ trong RAM tối đa 60 phút, không gắn người dùng.
+  Chỉ gửi khi bấm thao tác yêu cầu; bật theo dõi không tự gửi vị trí mới. Có nút
+  thu hồi để dừng gửi mới, huỷ yêu cầu đang chờ và bỏ kết quả muộn; dữ liệu đã gửi
+  xử lý theo notice v2; thu hồi hoặc xoá lịch sử ứng dụng không xoá tức thì log
+  Open-Meteo. Đồng ý này độc lập với đồng ý lưu lịch sử, không tự bật lưu.
   Không lưu điểm thủ công hoặc tọa độ trong log/đo lường lỗi. Đủ 30 ngày kể từ lúc
   ghi nhận, bản ghi không còn truy xuất được qua giao diện hoặc API ngay tại mốc hết hạn.
   Tác vụ nền xoá vật lý với mục tiêu trong 1 phút khi hệ thống hoạt động bình thường;
@@ -299,7 +317,17 @@ Người vận hành kiểm tra được trạng thái và tìm được lỗi k
 - **SC-007**: Các trường hợp kiểm thử tự động tại NFR-004 đều đạt trước demo;
   báo cáo phân biệt kết quả tự động và kiểm tra điện thoại thực (FR-001–FR-011).
 - **SC-008**: Kiểm tra ở chế độ ẩn danh và chưa bật lưu xác nhận không lưu bền vững
-  hoặc gửi GPS lên máy chủ ứng dụng; mọi log không chứa tọa độ (FR-008, FR-011, FR-012).
+  hoặc gửi GPS lên máy chủ ứng dụng, trừ yêu cầu xử lý tạm do người dùng chủ động
+  đồng ý theo spec 002 FR-019 (ứng dụng không lưu vị trí chính xác/không ghi log tọa
+  độ; Open-Meteo có thể giữ log tọa độ làm tròn tối đa 90 ngày theo notice v2), độc lập với đồng ý
+  lưu lịch sử; chỉ gửi sau khi bấm yêu cầu. Kiểm tra ngoại lệ với người ẩn danh/đã đăng nhập,
+  GPS/điểm chọn tay: notice v2 nêu đúng điểm, tọa độ làm tròn, hai bên nhận, thời hạn
+  log Open-Meteo và ứng dụng không lưu vị trí chính xác/không ghi log tọa độ;
+  thu hồi/xoá lịch sử không được báo là xoá ngay log nhà cung cấp;
+  đồng ý chỉ trong bộ nhớ tab, tải lại/đóng tab thì hết hiệu lực; theo dõi không tự
+  gửi vị trí mới. Thu hồi dừng gửi mới, huỷ yêu cầu đang chờ và bỏ kết quả muộn;
+  không tự bật lưu lịch sử. Mọi log do ứng dụng kiểm soát không chứa tọa độ
+  (FR-008, FR-011, FR-012).
 - **SC-009**: Kiểm thử tài khoản và đồng ý xác nhận chỉ lưu ba trường vị trí đã chốt;
   điểm thủ công không được lưu; tắt lưu dừng ghi mới; xoá toàn bộ làm dữ liệu hiện có
   không còn truy xuất được. Đủ 30 ngày từ lúc ghi nhận, giao diện và API không còn

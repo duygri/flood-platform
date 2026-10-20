@@ -1,0 +1,2502 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Flood Platform spec002 extension",
+    "version": "0.1.0-design",
+    "description": "Design contract only; extends001 without duplicating it. Anonymous endpoints; exact positions require explicit click and tab-RAM consent. Provider-retention disclosure accepted in temporary-processing-v2: Open-Meteo may retain request logs with rounded coordinates up to90days; application logs do not contain coordinates. Runtime notice/consent tests still required. P2 image may be deferred.",
+    "license": {
+      "name": "Project specification; implementation license follows repository"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.example.invalid",
+      "description": "Design placeholder, replace by verified AppService URL at deployment"
+    }
+  ],
+  "paths": {
+    "/api/v1/risk-rules": {
+      "get": {
+        "operationId": "GetRiskRules",
+        "summary": "Get published active rule configuration and checksum",
+        "tags": [
+          "Rules"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Result; degraded/insufficient status is explicit, not fake success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RulesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input/mode/scenario",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Explicit temporary consent required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rule or zone version mismatch",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Outside zone, no route or evaluation limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate or concurrency limit; Retry-After",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency or runtime release gate unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Deadline exceeded",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/simulation-scenarios": {
+      "get": {
+        "operationId": "GetSimulationScenarios",
+        "summary": "Get named immutable rain presets; no session write",
+        "tags": [
+          "Simulation"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Result; degraded/insufficient status is explicit, not fake success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input/mode/scenario",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Explicit temporary consent required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rule or zone version mismatch",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Outside zone, no route or evaluation limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate or concurrency limit; Retry-After",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency or runtime release gate unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Deadline exceeded",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/weather/at-point": {
+      "post": {
+        "operationId": "GetWeatherAtPoint",
+        "summary": "Get current model rain and three hourly slots",
+        "tags": [
+          "Weather"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Result; degraded/insufficient status is explicit, not fake success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input/mode/scenario",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Explicit temporary consent required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rule or zone version mismatch",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Outside zone, no route or evaluation limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate or concurrency limit; Retry-After",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency or runtime release gate unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Deadline exceeded",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PointRequest"
+              }
+            }
+          },
+          "description": "Maximum 16 KiB; exact points in body only. Response no-store.",
+          "x-max-body-bytes": 16384
+        }
+      }
+    },
+    "/api/v1/flood-history/nearby": {
+      "post": {
+        "operationId": "SearchFloodHistory",
+        "summary": "Query inclusive1000m geography history",
+        "tags": [
+          "FloodHistory"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Result; degraded/insufficient status is explicit, not fake success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input/mode/scenario",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Explicit temporary consent required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rule or zone version mismatch",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Outside zone, no route or evaluation limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate or concurrency limit; Retry-After",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency or runtime release gate unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Deadline exceeded",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistoryRequest"
+              }
+            }
+          },
+          "description": "Maximum 16 KiB; exact points in body only. Response no-store.",
+          "x-max-body-bytes": 16384
+        }
+      }
+    },
+    "/api/v1/risk/evaluate": {
+      "post": {
+        "operationId": "EvaluateFloodRisk",
+        "summary": "Explain versioned point risk",
+        "tags": [
+          "Risk"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Result; degraded/insufficient status is explicit, not fake success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input/mode/scenario",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Explicit temporary consent required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rule or zone version mismatch",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Outside zone, no route or evaluation limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate or concurrency limit; Retry-After",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency or runtime release gate unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Deadline exceeded",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RiskRequest"
+              }
+            }
+          },
+          "description": "Maximum 16 KiB; exact points in body only. Response no-store.",
+          "x-max-body-bytes": 16384
+        }
+      }
+    },
+    "/api/v1/routes/search": {
+      "post": {
+        "operationId": "FindRiskAwareRoutes",
+        "summary": "Rank up to3 OSRM candidates within time budget",
+        "tags": [
+          "SmartRoute"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Result; degraded/insufficient status is explicit, not fake success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input/mode/scenario",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Explicit temporary consent required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rule or zone version mismatch",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Outside zone, no route or evaluation limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate or concurrency limit; Retry-After",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency or runtime release gate unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Deadline exceeded",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RouteRequest"
+              }
+            }
+          },
+          "description": "Maximum 16 KiB; exact points in body only. Response no-store.",
+          "x-max-body-bytes": 16384
+        }
+      }
+    },
+    "/api/v1/field-evidence/images": {
+      "post": {
+        "operationId": "AssessFieldImage",
+        "summary": "P2: temporary image assessment or manual fallback",
+        "tags": [
+          "FieldEvidence"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Result; degraded/insufficient status is explicit, not fake success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input/mode/scenario",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Explicit temporary consent required",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Rule or zone version mismatch",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Outside zone, no route or evaluation limit",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate or concurrency limit; Retry-After",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency or runtime release gate unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Deadline exceeded",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Temporary-Consent",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "true"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Consent-Notice-Version",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "temporary-processing-v2"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Raw bounded <=5242880 bytes; no multipart spooling, max12MP decoded, no animated/image URL. Entire request no image persistence. P2 disabled503, never pretend enabled.",
+          "content": {
+            "image/jpeg": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 5242880
+              }
+            },
+            "image/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 5242880
+              }
+            }
+          },
+          "x-max-body-bytes": 5242880
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Point": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "longitude": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "latitude": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          }
+        },
+        "required": [
+          "longitude",
+          "latitude"
+        ],
+        "description": "WGS84 point; all exact coordinates only in POST body, not persisted/logged."
+      },
+      "PointRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "temporaryConsent": {
+            "type": "boolean",
+            "const": true
+          },
+          "consentNoticeVersion": {
+            "type": "string",
+            "const": "temporary-processing-v2"
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "simulation"
+            ]
+          },
+          "scenarioId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60,
+            "description": "Required non-null catalog ID only when mode=simulation; null in live. No custom rain values."
+          },
+          "point": {
+            "$ref": "#/components/schemas/Point"
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "temporaryConsent",
+          "consentNoticeVersion",
+          "ruleVersion",
+          "zoneVersion",
+          "mode",
+          "scenarioId",
+          "point"
+        ],
+        "description": "Server enforces mode/scenario consistency and ST_Covers before outbound work. Consent flag is protocol guard, not authentication.",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "simulation"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            "then": {
+              "properties": {
+                "scenarioId": {
+                  "type": "string",
+                  "enum": [
+                    "demo-dry",
+                    "demo-rain",
+                    "demo-heavy"
+                  ]
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "scenarioId": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "HistoryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "temporaryConsent": {
+            "type": "boolean",
+            "const": true
+          },
+          "consentNoticeVersion": {
+            "type": "string",
+            "const": "temporary-processing-v2"
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "point": {
+            "$ref": "#/components/schemas/Point"
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "temporaryConsent",
+          "consentNoticeVersion",
+          "ruleVersion",
+          "zoneVersion",
+          "point"
+        ],
+        "description": "Radius immutable from active rule: 1000m inclusive with documented 1mm numerical tolerance. Always real history dataset."
+      },
+      "RiskRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "temporaryConsent": {
+            "type": "boolean",
+            "const": true
+          },
+          "consentNoticeVersion": {
+            "type": "string",
+            "const": "temporary-processing-v2"
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "simulation"
+            ]
+          },
+          "scenarioId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60,
+            "description": "Required non-null catalog ID only when mode=simulation; null in live. No custom rain values."
+          },
+          "point": {
+            "$ref": "#/components/schemas/Point"
+          },
+          "evidenceToken": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "manualEvidence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high",
+              "unknown",
+              null
+            ]
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "temporaryConsent",
+          "consentNoticeVersion",
+          "ruleVersion",
+          "zoneVersion",
+          "mode",
+          "scenarioId",
+          "point"
+        ],
+        "description": "Optional evidenceToken OR manualEvidence, not both; token signed/expiry validated. No user-provided AI score. Evidence only this point.",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "simulation"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            "then": {
+              "properties": {
+                "scenarioId": {
+                  "type": "string",
+                  "enum": [
+                    "demo-dry",
+                    "demo-rain",
+                    "demo-heavy"
+                  ]
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "scenarioId": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ],
+        "anyOf": [
+          {
+            "properties": {
+              "evidenceToken": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "manualEvidence": {
+                "type": "null"
+              }
+            }
+          }
+        ]
+      },
+      "RouteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "temporaryConsent": {
+            "type": "boolean",
+            "const": true
+          },
+          "consentNoticeVersion": {
+            "type": "string",
+            "const": "temporary-processing-v2"
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "simulation"
+            ]
+          },
+          "scenarioId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60,
+            "description": "Required non-null catalog ID only when mode=simulation; null in live. No custom rain values."
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Point"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Point"
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "temporaryConsent",
+          "consentNoticeVersion",
+          "ruleVersion",
+          "zoneVersion",
+          "mode",
+          "scenarioId",
+          "origin",
+          "destination"
+        ],
+        "description": "No arbitrary waypoints/provider URL/profile/rain. v1 uses published car profile, not motorcycle navigation.",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "simulation"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            "then": {
+              "properties": {
+                "scenarioId": {
+                  "type": "string",
+                  "enum": [
+                    "demo-dry",
+                    "demo-rain",
+                    "demo-heavy"
+                  ]
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "scenarioId": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Source": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048
+          },
+          "attribution": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "dataTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "fetchedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "quality": {
+            "type": "string",
+            "enum": [
+              "fresh",
+              "stale",
+              "missing",
+              "simulation",
+              "unverified"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "name",
+          "url",
+          "attribution",
+          "dataTime",
+          "fetchedAt",
+          "quality",
+          "reason"
+        ]
+      },
+      "WeatherHour": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "rainMm": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "quality": {
+            "type": "string",
+            "enum": [
+              "fresh",
+              "stale",
+              "missing",
+              "simulation"
+            ]
+          }
+        },
+        "required": [
+          "start",
+          "rainMm",
+          "quality"
+        ]
+      },
+      "WeatherResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "traceId": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "ruleChecksum": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "datasetVersion": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60
+          },
+          "processedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "simulation"
+            ]
+          },
+          "scenarioId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxItems": 30
+          },
+          "disclaimer": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "degraded",
+              "unavailable"
+            ]
+          },
+          "currentRateMmPerHour": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "currentIntervalSeconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "currentValidTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "hourly": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeatherHour"
+            },
+            "maxItems": 3,
+            "minItems": 3
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "traceId",
+          "ruleVersion",
+          "ruleChecksum",
+          "zoneVersion",
+          "datasetVersion",
+          "processedAt",
+          "mode",
+          "scenarioId",
+          "warnings",
+          "disclaimer",
+          "status",
+          "currentRateMmPerHour",
+          "currentIntervalSeconds",
+          "currentValidTime",
+          "hourly",
+          "source"
+        ],
+        "description": "Exactly three future hourly slots, null if missing. Current model estimate not station measurement. Runtime notice/consent release gate503; provider retention disclosed in notice v2, never synthetic LIVE."
+      },
+      "FloodPoint": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "position": {
+            "$ref": "#/components/schemas/Point"
+          },
+          "distanceMeters": {
+            "type": "number",
+            "minimum": 0
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "severe",
+              "unknown"
+            ]
+          },
+          "observedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "confidence": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "unverified",
+              "unknown"
+            ]
+          },
+          "source": {
+            "$ref": "#/components/schemas/Source"
+          }
+        },
+        "required": [
+          "id",
+          "position",
+          "distanceMeters",
+          "severity",
+          "observedAt",
+          "confidence",
+          "verificationStatus",
+          "source"
+        ]
+      },
+      "HistoryResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "traceId": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "ruleChecksum": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "datasetVersion": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60
+          },
+          "processedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "simulation"
+            ]
+          },
+          "scenarioId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxItems": 30
+          },
+          "disclaimer": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "radiusMeters": {
+            "type": "number",
+            "const": 1000
+          },
+          "coverageComplete": {
+            "type": "boolean"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FloodPoint"
+            },
+            "maxItems": 500
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "traceId",
+          "ruleVersion",
+          "ruleChecksum",
+          "zoneVersion",
+          "datasetVersion",
+          "processedAt",
+          "mode",
+          "scenarioId",
+          "warnings",
+          "disclaimer",
+          "radiusMeters",
+          "coverageComplete",
+          "truncated",
+          "points"
+        ],
+        "description": "Risk facts query all matches, never uses truncated UI page as complete dataset."
+      },
+      "Factor": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "current",
+              "forecast",
+              "history",
+              "evidence",
+              "uncertainty_reserve"
+            ]
+          },
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "contribution": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "quality": {
+            "type": "string",
+            "enum": [
+              "fresh",
+              "stale",
+              "missing",
+              "simulation",
+              "self_reported",
+              "ai"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "id",
+          "value",
+          "weight",
+          "contribution",
+          "quality",
+          "reason",
+          "sources"
+        ]
+      },
+      "RiskValue": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "assessed",
+              "insufficient_data"
+            ]
+          },
+          "score": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "level": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "very_high",
+              null
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "lowerBound": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "upperBound": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "factors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Factor"
+            },
+            "maxItems": 10
+          },
+          "explanationVi": {
+            "type": "string",
+            "maxLength": 3000
+          }
+        },
+        "required": [
+          "status",
+          "score",
+          "level",
+          "confidence",
+          "lowerBound",
+          "upperBound",
+          "factors",
+          "explanationVi"
+        ],
+        "description": "Missing factors null, uncertainty reserve explicit. Insufficient score/level null. No calibrated real-world safety probability."
+      },
+      "RiskResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "traceId": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "ruleChecksum": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "datasetVersion": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60
+          },
+          "processedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "simulation"
+            ]
+          },
+          "scenarioId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxItems": 30
+          },
+          "disclaimer": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskValue"
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "traceId",
+          "ruleVersion",
+          "ruleChecksum",
+          "zoneVersion",
+          "datasetVersion",
+          "processedAt",
+          "mode",
+          "scenarioId",
+          "warnings",
+          "disclaimer",
+          "risk"
+        ]
+      },
+      "LineString": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "LineString"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "prefixItems": [
+                {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                }
+              ]
+            },
+            "maxItems": 15000,
+            "minItems": 2
+          }
+        },
+        "required": [
+          "type",
+          "coordinates"
+        ]
+      },
+      "RouteSegment": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "geometry": {
+            "$ref": "#/components/schemas/LineString"
+          },
+          "lengthMeters": {
+            "type": "number",
+            "minimum": 0
+          },
+          "score": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "level": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "very_high",
+              null
+            ]
+          },
+          "missing": {
+            "type": "boolean"
+          },
+          "explanationVi": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "geometry",
+          "lengthMeters",
+          "score",
+          "level",
+          "missing",
+          "explanationVi",
+          "sources"
+        ]
+      },
+      "Route": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "candidateId": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "geometry": {
+            "$ref": "#/components/schemas/LineString"
+          },
+          "distanceMeters": {
+            "type": "number",
+            "minimum": 0
+          },
+          "durationSeconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "highVeryHighMeters": {
+            "type": "number",
+            "minimum": 0
+          },
+          "missingMeters": {
+            "type": "number",
+            "minimum": 0
+          },
+          "knownCoverageRatio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "routeRiskScore": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "aggregateStatus": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial",
+              "insufficient_data"
+            ]
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteSegment"
+            },
+            "maxItems": 3000
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Source"
+            },
+            "maxItems": 40
+          },
+          "explanationVi": {
+            "type": "string",
+            "maxLength": 3000
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "candidateId",
+          "rank",
+          "geometry",
+          "distanceMeters",
+          "durationSeconds",
+          "highVeryHighMeters",
+          "missingMeters",
+          "knownCoverageRatio",
+          "routeRiskScore",
+          "aggregateStatus",
+          "segments",
+          "sources",
+          "explanationVi",
+          "warnings"
+        ]
+      },
+      "RouteResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "traceId": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "ruleChecksum": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "datasetVersion": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60
+          },
+          "processedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "simulation"
+            ]
+          },
+          "scenarioId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 60
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "maxItems": 30
+          },
+          "disclaimer": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Route"
+            },
+            "maxItems": 3,
+            "minItems": 1
+          },
+          "profile": {
+            "type": "string",
+            "const": "car-reference"
+          },
+          "fastestDurationSeconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "maxEligibleDurationSeconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "fallbackToFastest": {
+            "type": "boolean"
+          },
+          "evidenceApplied": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "traceId",
+          "ruleVersion",
+          "ruleChecksum",
+          "zoneVersion",
+          "datasetVersion",
+          "processedAt",
+          "mode",
+          "scenarioId",
+          "warnings",
+          "disclaimer",
+          "routes",
+          "profile",
+          "fastestDurationSeconds",
+          "maxEligibleDurationSeconds",
+          "fallbackToFastest",
+          "evidenceApplied"
+        ],
+        "description": "1-3 candidates, not globally optimal; all geometry covered by zone. Unknown score null, never zero."
+      },
+      "EvidenceResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "traceId": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "assessment": {
+            "type": "string",
+            "enum": [
+              "flood_signs",
+              "no_clear_signs",
+              "uncertain",
+              "manual_required"
+            ]
+          },
+          "descriptionVi": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "evidenceToken": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "expiresAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "fallbackReason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          },
+          "modelVersion": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          },
+          "elapsedMs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "disclaimer": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "traceId",
+          "assessment",
+          "descriptionVi",
+          "evidenceToken",
+          "expiresAt",
+          "fallbackReason",
+          "modelVersion",
+          "elapsedMs",
+          "disclaimer"
+        ]
+      },
+      "RulesResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "configuration": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "documentationUrl": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "zoneVersion": {
+            "type": "string",
+            "maxLength": 60
+          }
+        },
+        "required": [
+          "version",
+          "sha256",
+          "configuration",
+          "documentationUrl",
+          "zoneVersion"
+        ],
+        "description": "Exact configuration from validated rule bundle; no secrets; immutable version/checksum."
+      },
+      "Scenario": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "ruleVersion": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "currentRateMmPerHour": {
+            "type": "number",
+            "minimum": 0
+          },
+          "hourlyRainMm": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "ruleVersion",
+          "currentRateMmPerHour",
+          "hourlyRainMm"
+        ]
+      },
+      "ScenarioResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "scenarios": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Scenario"
+            },
+            "maxItems": 10
+          },
+          "serverStoresSelection": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "required": [
+          "scenarios",
+          "serverStoresSelection"
+        ]
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "traceId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "detail": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "traceId": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "additionalProperties": false,
+        "description": "Same shape spec001; sanitized, never point/provider URI/image/body/SQL details."
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "FieldEvidence",
+      "description": "Feature002 FieldEvidence"
+    },
+    {
+      "name": "FloodHistory",
+      "description": "Feature002 FloodHistory"
+    },
+    {
+      "name": "Risk",
+      "description": "Feature002 Risk"
+    },
+    {
+      "name": "Rules",
+      "description": "Feature002 Rules"
+    },
+    {
+      "name": "Simulation",
+      "description": "Feature002 Simulation"
+    },
+    {
+      "name": "SmartRoute",
+      "description": "Feature002 SmartRoute"
+    },
+    {
+      "name": "Weather",
+      "description": "Feature002 Weather"
+    }
+  ]
+}

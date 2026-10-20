@@ -71,13 +71,13 @@
 
   **Phụ thuộc**: T003. **Truy vết**: FR-008, FR-014; NFR-004, NFR-007; SC-008, SC-010.
 
-  **Hoàn thành**: Test trong/ngoài/sát biên hai phía/trên cạnh/đỉnh; accuracy-circle giao vùng không nới phạm vi. Ngoài vùng hiện “chưa hỗ trợ”, anonymous GPS không POST tọa độ lên server. RED trước T007.
+  **Hoàn thành**: Test trong/ngoài/sát biên hai phía/trên cạnh/đỉnh; accuracy-circle giao vùng không nới phạm vi. Ngoài vùng hiện “chưa hỗ trợ”, trong phạm vi spec 001 không có luồng nào gửi GPS của người dùng ẩn danh lên server; ngoại lệ xử lý tạm chỉ áp dụng khi spec 002 được triển khai kèm đồng ý rõ ràng, ứng dụng không lưu vị trí chính xác/không log tọa độ; notice v2 công bố Open-Meteo có thể giữ log tọa độ làm tròn tối đa 90 ngày, độc lập với đồng ý lưu lịch sử. RED trước T007.
 
 - [ ] T007 [US1] GREEN — GeoJSON local và boundary tại `apps/web/src/features/map/SupportZoneLayer.tsx`, `apps/web/src/features/map/support-area.ts`, `apps/web/scripts/package-support-zone.mjs`.
 
   **Phụ thuộc**: T004, T005, T006. **Truy vết**: FR-008, FR-014; NFR-007; SC-008, SC-010, SC-015.
 
-  **Hoàn thành**: Build dùng cùng file/version/checksum authoritative, không copy tay nguồn thứ hai. Vẽ boundary; point-on-segment rồi point-in-polygon tính cả biên, không snap/buffer. Fixture parity đạt; GPS anonymous check local, DB là thẩm quyền khi ghi.
+  **Hoàn thành**: Build dùng cùng file/version/checksum authoritative, không copy tay nguồn thứ hai. Vẽ boundary; point-on-segment rồi point-in-polygon tính cả biên, không snap/buffer. Fixture parity đạt; GPS anonymous check local, DB là thẩm quyền khi ghi. Trong phạm vi spec 001 không gửi GPS ẩn danh; ngoại lệ xử lý tạm chỉ áp dụng khi spec 002 được triển khai kèm đồng ý rõ ràng, ứng dụng không lưu vị trí chính xác/không log tọa độ; notice v2 công bố Open-Meteo có thể giữ log tọa độ làm tròn tối đa 90 ngày và độc lập với đồng ý lưu lịch sử.
 
 - [ ] T008 [P] [US1] RED — test lỗi map và public config tại `tests/e2e/map-failures.spec.ts`, `tests/e2e/public-config.spec.ts`.
 
@@ -144,7 +144,7 @@
 
   **Phụ thuộc**: T012. **Truy vết**: FR-002, FR-003, FR-004, FR-008; NFR-003; SC-002, SC-003, SC-008.
 
-  **Hoàn thành**: getCurrentPosition/watchPosition chủ động, enableHighAccuracy=true/timeout10000/maximumAge0; clearWatch và callback generation khi off/unmount/manual. Không upload hoặc persist tọa độ. Tests adapter green.
+  **Hoàn thành**: getCurrentPosition/watchPosition chủ động, enableHighAccuracy=true/timeout10000/maximumAge0; clearWatch và callback generation khi off/unmount/manual. Trong phạm vi spec 001 không có luồng nào gửi GPS của người dùng ẩn danh; adapter không upload hoặc persist tọa độ. Ngoại lệ xử lý tạm chỉ áp dụng khi spec 002 được triển khai kèm đồng ý rõ ràng, ứng dụng không lưu vị trí chính xác/không log tọa độ; notice v2 công bố Open-Meteo có thể giữ log tọa độ làm tròn tối đa 90 ngày, độc lập với đồng ý lưu lịch sử; không triển khai ngoại lệ tại task này. Tests adapter green.
 
 - [ ] T016 [US3] GREEN — state/UI tại `apps/web/src/features/location/location-machine.ts`, `apps/web/src/features/location/LocationControls.tsx`, `apps/web/src/features/map/UserLocationLayer.tsx`.
 
@@ -180,7 +180,7 @@
 
   **Phụ thuộc**: T015, T016, T017, T018, T020. **Truy vết**: FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-008, FR-015, FR-016; NFR-002, NFR-003, NFR-004; SC-002, SC-003, SC-004, SC-005, SC-008, SC-011, SC-012.
 
-  **Hoàn thành**: Map/GPS/manual/offline/log tests green, intercept network/storage chứng minh anonymous không gửi/lưu GPS; 360px, nút44px, banner không che thao tác. Chạy lại probe Playwright của T012: t0 performance.now() tại sự kiện thao tác trong trang, t1 tại khung hình đầu có thay đổi nhìn thấy xác nhận render/DOM observer và requestAnimationFrame; kéo/zoom/bật-tắt đều delta<=1000ms. Ghi từng t0/t1/delta và đường dẫn artifact vào báo cáo task, không thay bằng thời gian runner hoặc thời gian callback GPS. Refactor chạy lại; chưa coi mock là điện thoại thực.
+  **Hoàn thành**: Map/GPS/manual/offline/log tests green, intercept network/storage chứng minh trong phạm vi spec 001 không có luồng nào gửi/lưu GPS của người dùng ẩn danh; ngoại lệ xử lý tạm chỉ áp dụng khi spec 002 được triển khai kèm đồng ý rõ ràng, ứng dụng không lưu vị trí chính xác/không log tọa độ; notice v2 công bố Open-Meteo có thể giữ log tọa độ làm tròn tối đa 90 ngày, độc lập với đồng ý lưu lịch sử; 360px, nút44px, banner không che thao tác. Chạy lại probe Playwright của T012: t0 performance.now() tại sự kiện thao tác trong trang, t1 tại khung hình đầu có thay đổi nhìn thấy xác nhận render/DOM observer và requestAnimationFrame; kéo/zoom/bật-tắt đều delta<=1000ms. Ghi từng t0/t1/delta và đường dẫn artifact vào báo cáo task, không thay bằng thời gian runner hoặc thời gian callback GPS. Refactor chạy lại; chưa coi mock là điện thoại thực.
 
 - [ ] T022 [US2] GATE MỐC2 — DEMO ẨN DANH TRÊN ĐIỆN THOẠI tại `docs/validation/milestone-2-phone-demo.md`.
 
@@ -283,7 +283,7 @@
 
   **Phụ thuộc**: T004, T026, T029. **Truy vết**: FR-001, FR-008, FR-014; NFR-007; SC-008, SC-010, SC-015.
 
-  **Hoàn thành**: Import bất biến version/hash, đổi active transaction; cùng version khác checksum fail. GET Feature GeoJSON+ETag/304; POST check không lưu, Covers gồm biên, ngoài200 supported=false/message “chưa hỗ trợ”, version sai409. Integration SQL/parity và bao phủ toàn tuyến đạt; anonymous GPS vẫn chỉ local.
+  **Hoàn thành**: Import bất biến version/hash, đổi active transaction; cùng version khác checksum fail. GET Feature GeoJSON+ETag/304; POST check không lưu, Covers gồm biên, ngoài200 supported=false/message “chưa hỗ trợ”, version sai409. Integration SQL/parity và bao phủ toàn tuyến đạt; trong phạm vi spec 001 anonymous GPS vẫn chỉ local, không có luồng gửi lên server; ngoại lệ xử lý tạm chỉ áp dụng khi spec 002 được triển khai kèm đồng ý rõ ràng, ứng dụng không lưu vị trí chính xác/không log tọa độ; notice v2 công bố Open-Meteo có thể giữ log tọa độ làm tròn tối đa 90 ngày và độc lập với đồng ý lưu lịch sử.
 
 - [ ] T034 [US5] GREEN — record GPS tại `backend/src/Flood.Api/Modules/History/RecordPoint/Endpoint.cs`, `backend/src/Flood.Api/Modules/History/RecordPoint/Handler.cs`.
 

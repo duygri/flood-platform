@@ -1,0 +1,248 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Internal Flood Vision Worker P2",
+    "version": "0.1.0-design",
+    "description": "No public exposure, only .NET API service identity. Readiness only after pinned model warmup; one request/replica, queue0. Body RAM only, no temp files/logs. P2 may remain not implemented.",
+    "license": {
+      "name": "Project specification; implementation license follows repository"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://worker.internal.invalid"
+    }
+  ],
+  "paths": {
+    "/internal/v1/image-assessments": {
+      "post": {
+        "operationId": "AssessImageInternal",
+        "summary": "Internal raw image RAM-only inference, deadline<=12s, no coordinates or custom prompt",
+        "security": [
+          {
+            "serviceBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Correlation-ID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "X-Request-Timeout-Ms",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12000
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Raw bounded <=5242880 bytes; no multipart spooling, max12MP decoded, no animated/image URL. Entire request no image persistence. P2 disabled503, never pretend enabled.",
+          "content": {
+            "image/jpeg": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 5242880
+              }
+            },
+            "image/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "maxLength": 5242880
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ephemeral result; API creates signed evidence token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assessment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Sanitized error; no image persisted; API provides manual fallback",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized error; no image persisted; API provides manual fallback",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Sanitized error; no image persisted; API provides manual fallback",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Sanitized error; no image persisted; API provides manual fallback",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized error; no image persisted; API provides manual fallback",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized error; no image persisted; API provides manual fallback",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Sanitized error; no image persisted; API provides manual fallback",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Sanitized error; no image persisted; API provides manual fallback",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "serviceBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Assessment": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "assessment": {
+            "type": "string",
+            "enum": [
+              "flood_signs",
+              "no_clear_signs",
+              "uncertain"
+            ]
+          },
+          "descriptionVi": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "modelVersion": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "elapsedMs": {
+            "type": "number",
+            "minimum": 0
+          },
+          "warning": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "assessment",
+          "descriptionVi",
+          "modelVersion",
+          "elapsedMs",
+          "warning"
+        ]
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "traceId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "detail": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "traceId": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "additionalProperties": false,
+        "description": "Same shape spec001; sanitized, never point/provider URI/image/body/SQL details."
+      }
+    }
+  }
+}

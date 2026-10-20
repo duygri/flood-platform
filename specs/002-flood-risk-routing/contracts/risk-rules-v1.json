@@ -1,0 +1,156 @@
+{
+  "version": "risk-v1.0.0",
+  "status": "design-not-field-calibrated",
+  "weather": {
+    "forecastHours": 3,
+    "providerRoundingDegrees": 0.01,
+    "currentRateNormalizerMmPerHour": 20,
+    "forecastHourlyNormalizerMm": 20,
+    "freshFetchSeconds": 300,
+    "maxStaleFetchSeconds": 3600,
+    "maxCurrentValidAgeSeconds": 1800,
+    "staleQuality": 0.5,
+    "cacheMaxCells": 128,
+    "timeoutMilliseconds": 1500
+  },
+  "history": {
+    "radiusMeters": 1000,
+    "numericalToleranceMeters": 0.001,
+    "reviewAfterDays": 180,
+    "severity": {
+      "low": 0.25,
+      "medium": 0.5,
+      "high": 0.75,
+      "severe": 1,
+      "unknown": null
+    },
+    "verificationFactor": {
+      "verified": 1,
+      "unverified": 0.5,
+      "unknown": 0.25
+    },
+    "aggregation": "max(severity*declaredConfidence*verificationFactor*max(0,1-distance/1000))",
+    "coverageRequiredForZero": true
+  },
+  "risk": {
+    "weights": {
+      "current": 0.4,
+      "forecast": 0.3,
+      "history": 0.3
+    },
+    "minimumAvailableWeight": 0.6,
+    "minimumConfidence": 30,
+    "levels": [
+      {
+        "id": "low",
+        "minInclusive": 0,
+        "maxExclusive": 25
+      },
+      {
+        "id": "medium",
+        "minInclusive": 25,
+        "maxExclusive": 50
+      },
+      {
+        "id": "high",
+        "minInclusive": 50,
+        "maxExclusive": 75
+      },
+      {
+        "id": "very_high",
+        "minInclusive": 75,
+        "maxInclusive": 100
+      }
+    ],
+    "insufficientDataStatus": "insufficient_data",
+    "missingValue": null,
+    "missingPolicy": "upper_bound_with_explicit_uncertainty_reserve",
+    "formula": "score=min(100,100*sum(available_weight*normalized)+100*sum(missing_weight)+10*evidence)",
+    "confidence": "100*sum(weight*quality)",
+    "quality": {
+      "fresh": 1,
+      "stale": 0.5,
+      "missing": 0
+    }
+  },
+  "evidence": {
+    "optional": true,
+    "maxBonus": 10,
+    "manual": {
+      "none": 0,
+      "low": 0.25,
+      "medium": 0.5,
+      "high": 1,
+      "unknown": 0
+    },
+    "ai": {
+      "flood_signs": 0.5,
+      "no_clear_signs": 0,
+      "uncertain": 0
+    },
+    "tokenTtlSeconds": 300,
+    "appliesTo": "current_point_only",
+    "routingApplied": false
+  },
+  "routing": {
+    "maxDurationRatio": 1.5,
+    "maxExtraDurationSeconds": 600,
+    "maxSegmentMeters": 50,
+    "maxWeatherCells": 12,
+    "maxSegmentsPerSet": 3000,
+    "maxRouteMeters": 50000,
+    "maxSnapMeters": 50,
+    "maxCandidates": 3,
+    "requestedAlternatives": 2,
+    "samplePositions": [
+      "start",
+      "midpoint",
+      "end"
+    ],
+    "segmentRisk": "max(samples), missing if any sample insufficient",
+    "aggregate": "length_weighted_mean_of_known_segments; null_if_none",
+    "rank": [
+      "highVeryHighMeters",
+      "routeRiskScore_null_last",
+      "missingMeters",
+      "durationMilliseconds",
+      "stableCandidateId"
+    ],
+    "riskImprovement": "lexicographic(highVeryHighMeters,routeRiskScore) against fastest eligible candidate",
+    "fallback": "fastest_with_warning_if_no_lower_risk_candidate_in_time_budget",
+    "comparisonMetersDecimals": 2,
+    "comparisonScoreDecimals": 6
+  },
+  "scenarios": [
+    {
+      "id": "demo-dry",
+      "name": "Không mưa mô phỏng",
+      "currentRateMmPerHour": 0,
+      "hourlyRainMm": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "demo-rain",
+      "name": "Mưa vừa mô phỏng",
+      "currentRateMmPerHour": 10,
+      "hourlyRainMm": [
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "id": "demo-heavy",
+      "name": "Mưa lớn mô phỏng",
+      "currentRateMmPerHour": 20,
+      "hourlyRainMm": [
+        20,
+        20,
+        20
+      ]
+    }
+  ]
+}
